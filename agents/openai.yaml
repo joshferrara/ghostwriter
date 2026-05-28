@@ -1,0 +1,7 @@
+interface:
+  display_name: "Ghostwriter"
+  short_description: "Write in your personal voice"
+  default_prompt: "Use $ghostwriter to build my personal writing style guide from my sent writing."
+
+policy:
+  allow_implicit_invocation: true

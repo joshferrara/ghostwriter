@@ -1,0 +1,17 @@
+# Internal planning doc, not part of the skill
+goal.md
+
+# Generated guides and collected corpora should never be committed (may contain private writing)
+ghostwriter-guide.md
+write-like-me.md
+*.jsonl
+*.mbox
+*.eml
+sent-*.json
+clean.jsonl
+
+# OS / editor cruft
+.DS_Store
+*.swp
+__pycache__/
+*.pyc
