@@ -19,7 +19,10 @@ Same intent. One of them is yours. Once your guide is in place, agent-written dr
 ## Quickstart
 
 ```bash
-# 1. Install (one clone covers most agents; see "Install" below)
+# 1. Install (the skills CLI puts it in the right place for your agent)
+npx skills add joshferrara/ghostwriter
+
+# ...or clone by hand (one clone covers most agents; see "Install" below)
 git clone https://github.com/joshferrara/ghostwriter.git ~/.claude/skills/ghostwriter
 ```
 
@@ -133,6 +136,16 @@ For Gmail, both `openclaw/gogcli` and `googleworkspace/cli` are first-class opti
 ## Install
 
 Ghostwriter follows the open [Agent Skills](https://agentskills.io) standard: a folder with a `SKILL.md`. Most agents install a skill by cloning the repo into their skills directory. **Keep the folder named `ghostwriter`**, since the standard requires the folder name to match the skill's `name`.
+
+### Quick install (recommended)
+
+The [`skills` CLI](https://skills.sh) installs Ghostwriter into the right place for your agent, no manual cloning:
+
+```bash
+npx skills add joshferrara/ghostwriter
+```
+
+Then manage it with `npx skills list`, `npx skills update`, and `npx skills remove`. This is the easiest path and works across agents — the per-agent clone commands below remain available if you'd rather install by hand.
 
 ### Per agent
 
