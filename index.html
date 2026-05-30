@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ghostwriter | Teach your agent to write like you</title>
+<meta name="description" content="Ghostwriter studies the messages you've actually sent and turns them into a style guide your AI agent uses to draft in your voice. Spooky good." />
+<meta name="theme-color" content="#0a0a12" />
+
+<!-- Open Graph / Twitter -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Ghostwriter | Teach your agent to write like you" />
+<meta property="og:description" content="Your agent already writes well. It just doesn't write like you. Ghostwriter fixes that." />
+<meta property="og:url" content="https://joshferrara.github.io/ghostwriter/" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Ghostwriter | Teach your agent to write like you" />
+<meta name="twitter:description" content="Your agent already writes well. It just doesn't write like you. Ghostwriter fixes that." />
+
+<!-- Inline SVG ghost favicon -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='%23e9e9f4' d='M16 3C10 3 6 7.5 6 14v13l3-2 3 2 4-2.5L20 29l3-2 3 2V14c0-6.5-4-11-10-11z'/%3E%3Ccircle cx='12' cy='14' r='1.8' fill='%230a0a12'/%3E%3Ccircle cx='20' cy='14' r='1.8' fill='%230a0a12'/%3E%3C/svg%3E" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+<style>
+  :root {
+    --bg: #0a0a12;
+    --bg-2: #14142a;
+    --panel: rgba(255, 255, 255, 0.035);
+    --panel-border: rgba(160, 160, 200, 0.14);
+    --ink: #e9e9f4;
+    --muted: #9a9ab4;
+    --faint: #6c6c88;
+    --cyan: #8be9fd;
+    --violet: #a78bfa;
+    --display: "Fraunces", Georgia, "Times New Roman", serif;
+    --body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --mono: "JetBrains Mono", "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--body);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* Ambient deep-indigo glow + drifting mist */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: -20% -20% auto -20%;
+    height: 130vh;
+    background:
+      radial-gradient(60% 50% at 25% 15%, rgba(167, 139, 250, 0.16), transparent 60%),
+      radial-gradient(55% 45% at 80% 10%, rgba(139, 233, 253, 0.12), transparent 60%),
+      radial-gradient(80% 80% at 50% 0%, var(--bg-2), transparent 70%);
+    z-index: -2;
+    pointer-events: none;
+  }
+  .mist {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.5;
+    background:
+      radial-gradient(40% 30% at 20% 70%, rgba(139, 233, 253, 0.07), transparent 70%),
+      radial-gradient(45% 35% at 75% 60%, rgba(167, 139, 250, 0.07), transparent 70%);
+    animation: drift 26s ease-in-out infinite alternate;
+  }
+  @keyframes drift {
+    from { transform: translate3d(-3%, 0, 0) scale(1.05); }
+    to   { transform: translate3d(4%, -3%, 0) scale(1.15); }
+  }
+
+  .wrap { width: min(1080px, 92vw); margin: 0 auto; }
+
+  a { color: inherit; text-decoration: none; }
+
+  /* ---------- Nav ---------- */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    backdrop-filter: blur(10px);
+    background: rgba(10, 10, 18, 0.55);
+    border-bottom: 1px solid var(--panel-border);
+  }
+  nav .wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+  }
+  .brand { font-family: var(--display); font-size: 1.25rem; letter-spacing: 0.01em; display: flex; align-items: center; gap: 0.5rem; }
+  .brand .gh { filter: drop-shadow(0 0 8px rgba(139, 233, 253, 0.5)); }
+  .nav-links { display: flex; gap: 1.75rem; font-size: 0.95rem; color: var(--muted); }
+  .nav-links a:hover { color: var(--ink); }
+
+  /* ---------- Buttons ---------- */
+  .btn {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.8rem 1.4rem; border-radius: 999px;
+    font-weight: 500; font-size: 0.98rem; cursor: pointer;
+    border: 1px solid transparent; transition: transform 0.15s ease, box-shadow 0.25s ease, background 0.2s ease;
+  }
+  .btn-primary {
+    background: linear-gradient(120deg, var(--cyan), var(--violet));
+    color: #0a0a12; font-weight: 600;
+    box-shadow: 0 0 0 rgba(139, 233, 253, 0);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 40px rgba(139, 233, 253, 0.28); }
+  .btn-ghost { background: var(--panel); border-color: var(--panel-border); color: var(--ink); }
+  .btn-ghost:hover { transform: translateY(-2px); border-color: rgba(139, 233, 253, 0.5); }
+
+  /* ---------- Hero ---------- */
+  header.hero { padding: clamp(3.5rem, 9vw, 7rem) 0 clamp(2.5rem, 6vw, 4rem); }
+  .hero-grid { display: grid; grid-template-columns: 1.25fr 0.75fr; gap: 2rem; align-items: center; }
+  .eyebrow {
+    font-family: var(--mono); font-size: 0.8rem; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--cyan); margin-bottom: 1.2rem;
+  }
+  h1 {
+    font-family: var(--display); font-weight: 600;
+    font-size: clamp(2.6rem, 6.2vw, 4.6rem); line-height: 1.02; margin: 0 0 1.3rem;
+    letter-spacing: -0.01em;
+  }
+  h1 .glow { color: #fff; text-shadow: 0 0 28px rgba(139, 233, 253, 0.55), 0 0 60px rgba(167, 139, 250, 0.35); }
+  .lede { font-size: clamp(1.05rem, 2vw, 1.28rem); color: var(--muted); max-width: 38ch; margin: 0 0 1rem; }
+  .spooky { font-family: var(--display); font-style: italic; color: var(--ink); font-size: 1.15rem; margin-bottom: 1.9rem; }
+  .cta-row { display: flex; gap: 0.9rem; flex-wrap: wrap; margin-bottom: 1.8rem; }
+
+  /* Ghost wisp */
+  .ghost-stage { display: flex; justify-content: center; align-items: center; min-height: 280px; }
+  .ghost { width: min(240px, 60vw); animation: float 6s ease-in-out infinite; filter: drop-shadow(0 0 40px rgba(139, 233, 253, 0.35)); }
+  .ghost .body { animation: pulse 4s ease-in-out infinite; }
+  @keyframes float { 0%,100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-18px) rotate(1deg); } }
+  @keyframes pulse { 0%,100% { opacity: 0.92; } 50% { opacity: 1; } }
+
+  /* Install chip */
+  .chip {
+    display: inline-flex; align-items: center; gap: 0.75rem;
+    font-family: var(--mono); font-size: 0.92rem;
+    background: var(--panel); border: 1px solid var(--panel-border);
+    border-radius: 12px; padding: 0.65rem 0.65rem 0.65rem 1rem;
+  }
+  .chip .prompt { color: var(--faint); }
+  .chip code { color: var(--ink); }
+  .copy {
+    border: 1px solid var(--panel-border); background: rgba(139, 233, 253, 0.08);
+    color: var(--cyan); border-radius: 8px; padding: 0.35rem 0.7rem; font-family: var(--mono);
+    font-size: 0.8rem; cursor: pointer; transition: background 0.2s ease;
+  }
+  .copy:hover { background: rgba(139, 233, 253, 0.18); }
+
+  /* ---------- Sections ---------- */
+  section { padding: clamp(3rem, 8vw, 6rem) 0; }
+  .section-head { max-width: 46ch; margin-bottom: 2.6rem; }
+  .kicker { font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--violet); }
+  h2 { font-family: var(--display); font-weight: 600; font-size: clamp(1.9rem, 4vw, 2.9rem); line-height: 1.08; margin: 0.6rem 0 0.8rem; letter-spacing: -0.01em; }
+  .section-head p { color: var(--muted); font-size: 1.08rem; margin: 0; }
+
+  /* Why / before-after */
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+  .card {
+    background: var(--panel); border: 1px solid var(--panel-border); border-radius: 16px; padding: 1.6rem;
+  }
+  .card.you { border-color: rgba(139, 233, 253, 0.3); box-shadow: 0 0 50px rgba(139, 233, 253, 0.08) inset; }
+  .card .tag { font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--faint); margin-bottom: 1rem; }
+  .card.you .tag { color: var(--cyan); }
+  .card .msg { font-size: 1.02rem; color: var(--ink); }
+  .card.generic .msg { color: var(--muted); }
+
+  /* How it works */
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; }
+  .step .num { font-family: var(--display); font-size: 2.4rem; color: var(--violet); line-height: 1; }
+  .step h3 { font-family: var(--display); font-weight: 600; font-size: 1.3rem; margin: 0.6rem 0 0.4rem; }
+  .step p { color: var(--muted); margin: 0; font-size: 0.98rem; }
+  .arrow { color: var(--faint); }
+  .modes { margin-top: 1.6rem; color: var(--muted); font-size: 0.98rem; }
+  .modes b { color: var(--ink); font-weight: 600; }
+
+  /* What you get: manuscript */
+  .manuscript {
+    background: linear-gradient(180deg, rgba(20,20,42,0.6), rgba(10,10,18,0.6));
+    border: 1px solid var(--panel-border); border-radius: 16px; padding: 1.8rem;
+    font-family: var(--mono); font-size: 0.9rem; line-height: 1.8; overflow-x: auto;
+  }
+  .manuscript .h { color: var(--cyan); }
+  .manuscript .c { color: var(--faint); }
+  .manuscript .b { color: var(--ink); }
+  .get-grid { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 2rem; align-items: center; }
+
+  /* Install */
+  .install-box { text-align: center; max-width: 720px; margin: 0 auto; }
+  .install-cmd {
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    background: var(--panel); border: 1px solid var(--panel-border); border-radius: 14px;
+    padding: 1.1rem 1.1rem 1.1rem 1.5rem; font-family: var(--mono); font-size: 1.05rem;
+    margin: 1.6rem 0 1.2rem; text-align: left;
+  }
+  .install-cmd .line { color: var(--ink); }
+  .install-cmd .line::before { content: "$ "; color: var(--cyan); }
+  .or-talk { color: var(--muted); }
+  .or-talk em { color: var(--ink); font-style: italic; font-family: var(--display); }
+  .agents-note { color: var(--faint); font-size: 0.92rem; margin-top: 1.4rem; }
+  .agents-note a { color: var(--cyan); border-bottom: 1px solid rgba(139,233,253,0.3); }
+
+  /* Footer */
+  footer { border-top: 1px solid var(--panel-border); padding: 2.5rem 0 3.5rem; color: var(--faint); }
+  footer .wrap { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; font-size: 0.9rem; }
+  footer a { color: var(--muted); }
+  footer a:hover { color: var(--ink); }
+  footer .sign { font-family: var(--display); font-style: italic; color: var(--muted); }
+
+  /* Scroll reveal */
+  .reveal { opacity: 0; transform: translateY(22px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.in { opacity: 1; transform: none; }
+
+  /* Copied toast on chips */
+  .copied { color: var(--cyan) !important; }
+
+  @media (max-width: 820px) {
+    .hero-grid { grid-template-columns: 1fr; }
+    .ghost-stage { order: -1; min-height: 200px; }
+    .nav-links { display: none; }
+    .compare, .steps, .get-grid { grid-template-columns: 1fr; }
+    .install-cmd { font-size: 0.92rem; flex-direction: column; align-items: stretch; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .mist, .ghost, .ghost .body { animation: none !important; }
+    .reveal { opacity: 1; transform: none; transition: none; }
+  }
+</style>
+</head>
+<body>
+<div class="mist" aria-hidden="true"></div>
+
+<nav>
+  <div class="wrap">
+    <a class="brand" href="#top"><span class="gh" aria-hidden="true">👻</span> Ghostwriter</a>
+    <div class="nav-links">
+      <a href="#why">Why</a>
+      <a href="#how">How it works</a>
+      <a href="#install">Install</a>
+      <a href="https://github.com/joshferrara/ghostwriter">GitHub ↗</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow">Write like you, automatically</div>
+      <h1>Teach your agent to <span class="glow">write like you.</span></h1>
+      <p class="lede">Your agent already writes well. It just doesn't write like <em>you</em>. Ghostwriter studies the messages you've actually sent and turns them into a style guide it drafts from.</p>
+      <p class="spooky">Once your guide is in place, every draft feels spooky good.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#install">Get started</a>
+        <a class="btn btn-ghost" href="https://github.com/joshferrara/ghostwriter">View on GitHub</a>
+      </div>
+      <div class="chip">
+        <span class="prompt">npx</span><code>skills add joshferrara/ghostwriter</code>
+        <button class="copy" data-copy="npx skills add joshferrara/ghostwriter">Copy</button>
+      </div>
+    </div>
+    <div class="ghost-stage">
+      <svg class="ghost" viewBox="0 0 200 220" role="img" aria-label="A friendly glowing ghost holding a pencil">
+        <defs>
+          <radialGradient id="g" cx="50%" cy="38%" r="65%">
+            <stop offset="0%" stop-color="#ffffff" />
+            <stop offset="55%" stop-color="#e9e9f4" />
+            <stop offset="100%" stop-color="#bfc7ff" />
+          </radialGradient>
+        </defs>
+        <g class="body">
+          <path fill="url(#g)" d="M100 14c-39 0-66 30-66 72v104c0 8 9 12 15 7l14-11 16 12c3 2 7 2 10 0l16-12 16 12c3 2 7 2 10 0l16-12 14 11c6 5 15 1 15-7V86c0-42-27-72-66-72z"/>
+          <circle cx="78" cy="92" r="9" fill="#0a0a12"/>
+          <circle cx="122" cy="92" r="9" fill="#0a0a12"/>
+          <circle cx="81" cy="89" r="3" fill="#fff"/>
+          <circle cx="125" cy="89" r="3" fill="#fff"/>
+          <path d="M88 118 q12 12 24 0" stroke="#0a0a12" stroke-width="4" fill="none" stroke-linecap="round"/>
+          <ellipse cx="60" cy="112" rx="9" ry="6" fill="#a78bfa" opacity="0.45"/>
+          <ellipse cx="140" cy="112" rx="9" ry="6" fill="#8be9fd" opacity="0.45"/>
+          <g transform="translate(291 0) scale(-1 1) rotate(-26 143 145)">
+            <rect x="113" y="139" width="52" height="11" rx="3" fill="#f8d66d"/>
+            <rect x="111" y="139" width="8" height="11" rx="2" fill="#f0a0b4"/>
+            <rect x="119" y="139" width="3" height="11" fill="#c6c6d8"/>
+            <path d="M165 139l15 5.5-15 5.5z" fill="#e6c19a"/>
+            <path d="M176 143.2l4 1.3-4 1.3z" fill="#0a0a12"/>
+            <path d="M137 135c6 2 10 6 12 12" stroke="#dfe5ff" stroke-width="9" fill="none" stroke-linecap="round"/>
+          </g>
+        </g>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<section id="why">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="kicker">The problem</div>
+      <h2>Generic AI has a tell. You don't sound like that.</h2>
+      <p>"I hope this email finds you well." Forced enthusiasm. That smooth, sourceless cadence. You can spot it in a second, and so can the people reading your email. Same message, two different tones:</p>
+    </div>
+    <div class="compare reveal">
+      <div class="card generic">
+        <div class="tag">Generic AI</div>
+        <p class="msg">"I hope this email finds you well! I wanted to circle back regarding the contract. Please let me know at your earliest convenience. Thanks so much!"</p>
+      </div>
+      <div class="card you">
+        <div class="tag">You, via Ghostwriter</div>
+        <p class="msg">"hey, quick question. did the contract ever get signed? no rush, just checking some things off my list."</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="kicker">How it works</div>
+      <h2>Point it at your writing. It picks up the pattern.</h2>
+      <p>No prompt engineering project. No settings panel. Just a short conversation with your agent.</p>
+    </div>
+    <div class="steps reveal">
+      <div class="step">
+        <div class="num">1</div>
+        <h3>Point it at your sent messages</h3>
+        <p>Email, texts, Slack, exports. Whatever you already have. It reads only what you confirm, and only what <em>you</em> sent.</p>
+      </div>
+      <div class="step">
+        <div class="num">2</div>
+        <h3>It writes your style guide</h3>
+        <p>It turns your habits into one portable <code>ghostwriter-guide.md</code>: openings, tone, brevity, and the way you make an ask.</p>
+      </div>
+      <div class="step">
+        <div class="num">3</div>
+        <h3>Your agent drafts as you</h3>
+        <p>From then on, the guide is the authority. Drafts start in your voice, then a light cleanup removes AI slop without sanding off the parts that sound like you.</p>
+      </div>
+    </div>
+    <p class="modes reveal">The <code>Generate</code> task builds your style guide. The <code>Use</code> task applies it when your agent drafts or edits for you.</p>
+  </div>
+</section>
+
+<section id="get">
+  <div class="wrap get-grid">
+    <div class="section-head reveal" style="margin-bottom:0">
+      <div class="kicker">What you get</div>
+      <h2>Your voice, written down.</h2>
+      <p>One readable markdown file that captures how you write, ready to paste into any agent that needs to draft in your voice.</p>
+    </div>
+    <div class="manuscript reveal" aria-label="Example excerpt of a Ghostwriter guide">
+      <div class="c"># Alex's Writing Style Guide</div>
+      <br/>
+      <div class="h">## Openings</div>
+      <div class="b">- "Hey [Name]!" Warm, the default.</div>
+      <div class="b">- "Hi all," For broader or formal threads.</div>
+      <br/>
+      <div class="h">## Tone mechanics</div>
+      <div class="b">- Exclamation points: frequent, one at a time</div>
+      <div class="b">- Emoji: 🙏 😅 in chat; never in client email</div>
+      <br/>
+      <div class="h">## What to avoid</div>
+      <div class="b">- Don't open with "I hope this finds you well."</div>
+      <div class="b">- Never stiff, salesy, or buzzword-heavy.</div>
+    </div>
+  </div>
+</section>
+
+<section id="install">
+  <div class="wrap install-box">
+    <div class="section-head reveal" style="margin: 0 auto 0.5rem; text-align:center;">
+      <div class="kicker">Get Started</div>
+      <h2>Install Ghostwriter.</h2>
+    </div>
+    <div class="install-cmd reveal">
+      <span class="line">npx skills add joshferrara/ghostwriter</span>
+      <button class="copy" data-copy="npx skills add joshferrara/ghostwriter">Copy</button>
+    </div>
+    <p class="or-talk reveal">…then just ask your agent: <em>"Build my Ghostwriter guide from my sent email."</em></p>
+    <p class="agents-note reveal">Works across Claude Code, Codex, Cursor, OpenCode, OpenClaw, and more because it follows the open <a href="https://agentskills.io">Agent Skills</a> standard. Per-agent install commands and the full details live in the <a href="https://github.com/joshferrara/ghostwriter#install">README</a>.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span class="sign">Ghostwriter: spooky good drafts, in your voice.</span>
+    <span>
+      <a href="https://github.com/joshferrara/ghostwriter">GitHub</a> ·
+      <a href="https://github.com/joshferrara/ghostwriter/blob/main/LICENSE">MIT License</a> ·
+      <a href="https://github.com/blader/humanizer">Humanizer</a>
+    </span>
+  </div>
+</footer>
+
+<script>
+  // Copy-to-clipboard with a transient confirmation
+  document.querySelectorAll(".copy").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var text = btn.getAttribute("data-copy");
+      var done = function () {
+        var prev = btn.textContent;
+        btn.textContent = "copied 👻";
+        btn.classList.add("copied");
+        setTimeout(function () { btn.textContent = prev; btn.classList.remove("copied"); }, 1600);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done).catch(done);
+      } else {
+        var ta = document.createElement("textarea");
+        ta.value = text; document.body.appendChild(ta); ta.select();
+        try { document.execCommand("copy"); } catch (e) {}
+        document.body.removeChild(ta); done();
+      }
+    });
+  });
+
+  // Scroll reveal (skipped under reduced-motion via CSS)
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (!reduce && "IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.15 });
+    document.querySelectorAll(".reveal").forEach(function (el) { io.observe(el); });
+  } else {
+    document.querySelectorAll(".reveal").forEach(function (el) { el.classList.add("in"); });
+  }
+</script>
+</body>
+</html>
